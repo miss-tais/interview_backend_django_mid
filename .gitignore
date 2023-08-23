@@ -6,3 +6,5 @@ ANSWER.md
 *.env
 *reset_database.sh
 *.venv*
+.idea/*
+.DS_Store
