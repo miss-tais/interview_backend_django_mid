@@ -1,23 +1,31 @@
+import json
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from interview.inventory.models import Inventory, InventoryLanguage, InventoryTag, InventoryType
 from interview.inventory.schemas import InventoryMetaData
-from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
+from interview.inventory.serializers import (
+    InventoryLanguageSerializer,
+    InventorySerializer,
+    InventoryTagSerializer,
+    InventoryTypeSerializer,
+)
 
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
-    
+
     def post(self, request: Request, *args, **kwargs) -> Response:
         try:
             metadata = InventoryMetaData(**request.data['metadata'])
         except Exception as e:
             return Response({'error': str(e)}, status=400)
-        
-        request.data['metadata'] = metadata.dict()
+
+        request.data['metadata'] = json.dumps(metadata.dict(), default=str)
+
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
